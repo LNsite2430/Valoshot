@@ -1,0 +1,19 @@
+name: Valoshot
+version: '${version}'
+main: me.xcorpjp.valoshot.Valoshot
+api-version: '1.20'
+commands:
+  valoshot:
+    description: Main command for Valoshot
+    permission: valoshot.use
+
+permissions:
+  valoshot.use:
+    description: Allow basic commands
+    default: true
+  valoshot.admin:
+    description: Allow reload
+    default: op
+  valoshot.give:
+    description: Allow give
+    default: true
