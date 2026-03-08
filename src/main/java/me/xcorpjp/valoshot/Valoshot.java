@@ -12,7 +12,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class Valoshot extends JavaPlugin {
@@ -21,6 +23,7 @@ public final class Valoshot extends JavaPlugin {
     private GunManager gunManager;
     private GunListener gunListener;
     private final Map<UUID, Long> lastHeadshotTime = new HashMap<>();
+    private final Set<UUID> hadGunPlayers = new HashSet<>();
 
     @Override
     public void onEnable() {
@@ -48,8 +51,10 @@ public final class Valoshot extends JavaPlugin {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     ItemStack item = player.getInventory().getItemInMainHand();
                     GunData data = gunManager.getGunData(item);
+                    UUID uuid = player.getUniqueId();
 
                     if (data != null) {
+                        hadGunPlayers.add(uuid);
                         if (gunListener.isReloading(player.getUniqueId()))
                             continue;
 
@@ -75,8 +80,11 @@ public final class Valoshot extends JavaPlugin {
                                             + data.getMagazineSize() + emptyText));
                         }
                     } else {
-                        // 武器を持っていない場合はアクションバーをリセット
-                        player.sendActionBar(Component.empty());
+                        // 武器を持っていない場合はアクションバーを一度だけリセット
+                        if (hadGunPlayers.contains(uuid)) {
+                            player.sendActionBar(Component.empty());
+                            hadGunPlayers.remove(uuid);
+                        }
                     }
                 }
             }
